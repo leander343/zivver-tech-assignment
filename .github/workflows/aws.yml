@@ -10,6 +10,10 @@ on:
     paths:
      - "ziv-app/**"
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy ECS infrastructure"]
+    types:
+      - completed
   
     
 permissions:
