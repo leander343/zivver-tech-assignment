@@ -1,6 +1,6 @@
 resource "aws_security_group" "lb" {
-  name        = "load-balancer-security-group"
-  vpc_id      = aws_vpc.ecs.id
+  name   = "load-balancer-security-group"
+  vpc_id = aws_vpc.ecs.id
 
   ingress {
     protocol    = "tcp"
@@ -10,29 +10,29 @@ resource "aws_security_group" "lb" {
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 
 resource "aws_security_group" "ecs" {
-  name        = "ecs-security-group"
-  vpc_id      = aws_vpc.ecs.id
+  name   = "ecs-security-group"
+  vpc_id = aws_vpc.ecs.id
 
   ingress {
-    protocol    = "tcp"
-    from_port   = 80
-    to_port     = 80
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
     security_groups = [aws_security_group.lb.id]
   }
 
   egress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }

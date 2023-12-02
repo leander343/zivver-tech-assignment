@@ -4,8 +4,8 @@ resource "aws_ecs_task_definition" "zivvy_app" {
   requires_compatibilities = ["FARGATE"]
   cpu                      = 1024
   memory                   = 2048
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  container_definitions = <<DEFINITION
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
+  container_definitions    = <<DEFINITION
 [
   {
     "image": "nginx:latest",
@@ -40,11 +40,11 @@ resource "aws_ecs_cluster" "main" {
 }
 
 resource "aws_ecs_service" "zivvy_app_service" {
-  name            = "zivvy-service"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.zivvy_app.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                 = "zivvy-service"
+  cluster              = aws_ecs_cluster.main.id
+  task_definition      = aws_ecs_task_definition.zivvy_app.arn
+  desired_count        = 1
+  launch_type          = "FARGATE"
   force_new_deployment = true
 
   deployment_minimum_healthy_percent = 100
@@ -66,11 +66,11 @@ resource "aws_ecs_service" "zivvy_app_service" {
 
 
 resource "aws_appautoscaling_target" "target_scaling" {
-  max_capacity = 5
-  min_capacity = 1
-  resource_id = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.zivvy_app_service.name}"
+  max_capacity       = 5
+  min_capacity       = 1
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.zivvy_app_service.name}"
   scalable_dimension = "ecs:service:DesiredCount"
-  service_namespace = "ecs"
+  service_namespace  = "ecs"
 }
 
 resource "aws_appautoscaling_policy" "memory-scaling" {
@@ -85,16 +85,16 @@ resource "aws_appautoscaling_policy" "memory-scaling" {
       predefined_metric_type = "ECSServiceAverageMemoryUtilization"
     }
 
-    target_value       = 80
+    target_value = 80
   }
 }
 
 resource "aws_appautoscaling_policy" "cpu-scaling" {
-  name = "dev-to-cpu"
-  policy_type = "TargetTrackingScaling"
-  resource_id = aws_appautoscaling_target.target_scaling.resource_id
+  name               = "dev-to-cpu"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.target_scaling.resource_id
   scalable_dimension = aws_appautoscaling_target.target_scaling.scalable_dimension
-  service_namespace = aws_appautoscaling_target.target_scaling.service_namespace
+  service_namespace  = aws_appautoscaling_target.target_scaling.service_namespace
 
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
