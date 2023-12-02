@@ -1,0 +1,75 @@
+name: 'Destroy ECS infrastructure'
+
+on:
+  workflow_dispatch:  
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform Destroy'
+    runs-on: ubuntu-latest
+    environment: zivver
+
+    env:
+     GITHUB_TOKEN: ${{ secrets.GT_TOKEN }}
+
+      
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: terraform
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    # Install the latest version of Terraform CLI 
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ vars.AWS_REGION }}
+
+    - name: Setup Terraform Backend
+      env:
+        BUCKET_NAME: ${{ vars.BUCKET_NAME }}
+        DYNAMODB_NAME: ${{ vars.DYNAMODB_NAME }}
+      run: |
+        cat > backend.tf << EOF
+        terraform {
+          backend "s3" {
+            bucket         = "$BUCKET_NAME"
+            key            = "terraform.tfstate"
+            region         = "ap-south-1"
+            dynamodb_table = "$DYNAMODB_NAME"
+          }
+         }
+        EOF
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init
+
+    # Destroy plan
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan -destroy
+
+    # Destroy infrastructure
+    - name: Terraform Apply
+      run: terraform destroy -auto-approve  
+
+
+
+    
+
+
