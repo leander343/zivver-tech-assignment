@@ -75,6 +75,15 @@ jobs:
       if: github.ref == 'refs/heads/master' && steps.plan.outputs.exitcode == 2
       run: terraform apply -auto-approve terraplan 
 
+    - name: Create Terraform output artifact
+      run: terraform output -json > terraform-out.json
+
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v3.1.3
+      with:
+        name: terraform-output
+        path: ./terraform-out.json
+
     
 
 
