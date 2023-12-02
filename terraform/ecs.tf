@@ -62,6 +62,12 @@ resource "aws_ecs_service" "zivvy_app_service" {
   }
 
   depends_on = [aws_lb_listener.zivvy]
+
+  lifecycle {
+
+    ignore_changes = [task_definition]
+
+  }
 }
 
 
