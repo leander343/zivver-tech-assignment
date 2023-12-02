@@ -20,7 +20,26 @@ permissions:
   contents: read
 
 jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Set job outputs to values from filter step
+    outputs:
+      ziv-app: ${{ steps.filter.outputs.ziv }}
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          ziv:
+            - 'ziv-app/**'
+
   deploy:
+    needs: changes
+    if: ${{ needs.changes.outputs.ziv == 'true' }}
     name: Deploy
     runs-on: ubuntu-latest
     environment: zivver
