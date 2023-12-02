@@ -1,15 +1,10 @@
-# This workflow installs the latest version of Terraform CLI and configures the Terraform CLI configuration file
-# with an API token for Terraform Cloud (app.terraform.io). On pull request events, this workflow will run
-# `terraform init`, `terraform fmt`, and `terraform plan` (speculative plan via Terraform Cloud). On push events
-# to the "master" branch, `terraform apply` will be executed.
-#
-# Documentation for `hashicorp/setup-terraform` is located here: https://github.com/hashicorp/setup-terraform
-#
 name: 'Terraform'
 
 on:
   push:
     branches: [ "master" ]
+    paths: 
+     - "terraform/**"
   pull_request:
   workflow_dispatch:
 
@@ -23,7 +18,6 @@ jobs:
     environment: Terraform
 
       
-
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
@@ -37,7 +31,7 @@ jobs:
 
     # Install the latest version of Terraform CLI 
     - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
 
       
     - name: Configure AWS credentials
@@ -67,9 +61,20 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
+    # Generates an execution plan for Terraform
+    - name: Terraform validate
+      run: terraform validate 
 
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -input=false
+      id: plan
+      run: terraform plan -input=false -detailed-exitcode -out terraplan
+
+    # build or change infrastructure according to Terraform configuration files
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/master' && steps.plan.outputs.exitcode == 2
+      run: terraform apply -auto-approve terraplan 
+
+    
 
 
