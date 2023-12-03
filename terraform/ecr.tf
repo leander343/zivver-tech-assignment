@@ -5,9 +5,11 @@ resource "aws_ecr_repository" "zivvy" {
   image_scanning_configuration {
     scan_on_push = true
   }
+
+  force_delete = true
 }
 
-resource "aws_ecr_lifecycle_policy" "foopolicy" {
+resource "aws_ecr_lifecycle_policy" "lifecyle" {
   repository = aws_ecr_repository.zivvy.name
 
   policy = <<EOF

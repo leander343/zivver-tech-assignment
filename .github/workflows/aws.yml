@@ -10,7 +10,10 @@ on:
     paths:
      - "ziv-app/**"
   workflow_dispatch:
-  workflow_call:
+  workflow_run:
+    workflows: ["Deploy ECS infrastructure"]
+    types:
+      - completed
   
     
 permissions:
@@ -22,6 +25,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: zivver
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     env:
      AWS_REGION: ${{ vars.AWS_REGION }}                  # set this to your preferred AWS region, e.g. us-west-1
      ECR_REPOSITORY: ${{ vars.REPOSITORY_NAME }}        # set this to your Amazon ECR repository name
