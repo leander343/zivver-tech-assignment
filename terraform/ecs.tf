@@ -1,3 +1,5 @@
+
+# Task definition with a basic nginx image in place which will be replaced with a subsequent CI run
 resource "aws_ecs_task_definition" "zivvy_app" {
   family                   = "zivvy-app"
   network_mode             = "awsvpc"
@@ -34,11 +36,13 @@ DEFINITION
 
 }
 
+#ECS cluster 
 
 resource "aws_ecs_cluster" "main" {
   name = "zivvy-cluster"
 }
 
+# ECE service to run task definition 
 resource "aws_ecs_service" "zivvy_app_service" {
   name                 = "zivvy-service"
   cluster              = aws_ecs_cluster.main.id
@@ -47,6 +51,7 @@ resource "aws_ecs_service" "zivvy_app_service" {
   launch_type          = "FARGATE"
   force_new_deployment = true
 
+  # Config to keep old container running before newly deployed container is up
   deployment_minimum_healthy_percent = 100
   deployment_maximum_percent         = 200
 
@@ -70,6 +75,7 @@ resource "aws_ecs_service" "zivvy_app_service" {
   }
 }
 
+# Auto scaling policies depening on CPU and Memory parameters 
 
 resource "aws_appautoscaling_target" "target_scaling" {
   max_capacity       = 5

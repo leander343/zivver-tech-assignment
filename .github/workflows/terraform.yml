@@ -1,11 +1,13 @@
+# This workflow will build  infrastructure required to host containers in ECS
+
 name: 'Deploy ECS infrastructure'
 
+# Trigger workflow only if there are changes pushed to path or on manual dispatch
 on:
   push:
     branches: [ "master" ]
     paths: 
-     - "terraform/**"
-  pull_request:
+     - "terraform/**" 
   workflow_dispatch:
 
 permissions:
@@ -15,8 +17,8 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
-    environment: zivver
 
+    # Github PAT token required to push environment variables using Terraform 
     env:
      GITHUB_TOKEN: ${{ secrets.GT_TOKEN }}
 
@@ -36,14 +38,15 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
 
-      
+    # Configure AWS credentials to use for Job 
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ vars.AWS_REGION }}
-
+    
+    # Setup config to access remote S3 backend 
     - name: Setup Terraform Backend
       env:
         BUCKET_NAME: ${{ vars.BUCKET_NAME }}
@@ -64,18 +67,18 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-    # Generates an execution plan for Terraform
+    # Validate Terraform code to make sure there are no errors 
     - name: Terraform validate
       run: terraform validate 
 
-    # Generates an execution plan for Terraform
+    # Generates an execution plan for Terraform and outputs exitcode depending on if there are changes in plan or not 
     - name: Terraform Plan
       id: plan
-      run: terraform plan -input=false -detailed-exitcode -out terraplan
+      run: terraform plan -input=false -detailed-exitcode -out terraplan 
 
-    # build or change infrastructure according to Terraform configuration files
+    # Build or change infrastructure according to Terraform configuration files
     - name: Terraform Apply
-      if: github.ref == 'refs/heads/master' && steps.plan.outputs.exitcode == 2
+      if: github.ref == 'refs/heads/master' && steps.plan.outputs.exitcode == 2 # Execute only in case there are changes 
       run: terraform apply -auto-approve terraplan 
 
 

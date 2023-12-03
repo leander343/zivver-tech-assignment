@@ -1,3 +1,5 @@
+# This workflow will destroy all provisioned  ECS infrastructure 
+
 name: 'Destroy ECS infrastructure'
 
 on:
@@ -10,7 +12,6 @@ jobs:
   terraform:
     name: 'Terraform Destroy'
     runs-on: ubuntu-latest
-    environment: zivver
 
     env:
      GITHUB_TOKEN: ${{ secrets.GT_TOKEN }}

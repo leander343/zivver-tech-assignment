@@ -1,8 +1,9 @@
 
-
+# Retrieve all availability zones for particualr region
 data "aws_availability_zones" "zones" {
   state = "available"
 }
+
 
 resource "aws_vpc" "ecs" {
   cidr_block = "10.0.0.0/16"
@@ -52,7 +53,7 @@ resource "aws_route_table_association" "public" {
 }
 
 
-# Private Subnets and route table association 
+# Private Subnets, Nat gateway and route table association 
 
 resource "aws_subnet" "private" {
   count             = 2

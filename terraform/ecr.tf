@@ -1,3 +1,5 @@
+# ECR repository to host images. 
+
 resource "aws_ecr_repository" "zivvy" {
   name                 = "zivvy-ecr"
   image_tag_mutability = "MUTABLE"
@@ -9,6 +11,7 @@ resource "aws_ecr_repository" "zivvy" {
   force_delete = true
 }
 
+# Policy to only store last 5 images, value can be increased if necessary. 
 resource "aws_ecr_lifecycle_policy" "lifecyle" {
   repository = aws_ecr_repository.zivvy.name
 

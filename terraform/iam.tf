@@ -1,3 +1,4 @@
+# ECS executionpolicy with added permission to create logs 
 resource "aws_iam_policy" "ecs_policy" {
   name = "zivvy-ecs-policy"
   policy = jsonencode(
@@ -21,6 +22,9 @@ resource "aws_iam_policy" "ecs_policy" {
     }
   )
 }
+
+
+# Create IAM role and attach policy, to be used as execution role for ECS
 
 resource "aws_iam_role" "zivvy_task_role" {
   name = "zivvy-webapp-role"

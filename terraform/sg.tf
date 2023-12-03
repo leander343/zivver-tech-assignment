@@ -1,3 +1,4 @@
+# Load balancer security group 
 resource "aws_security_group" "lb" {
   name   = "load-balancer-security-group"
   vpc_id = aws_vpc.ecs.id
@@ -17,7 +18,7 @@ resource "aws_security_group" "lb" {
   }
 }
 
-
+# ECS security group
 resource "aws_security_group" "ecs" {
   name   = "ecs-security-group"
   vpc_id = aws_vpc.ecs.id

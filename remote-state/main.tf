@@ -2,6 +2,8 @@ provider "aws" {
   region = "ap-south-1"
 }
 
+
+# Create a S3 bucket to store remote state 
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "tfstate-zivvy"
 
@@ -18,6 +20,8 @@ resource "aws_s3_bucket_versioning" "terraform_state" {
   }
 }
 
+# Create a dynamodb 
+# Required for state locking
 resource "aws_dynamodb_table" "terraform_state_lock" {
   name           = "app-state-zivvy"
   read_capacity  = 1

@@ -1,3 +1,5 @@
+
+# Load balancer to forward traffic to ECS
 resource "aws_lb" "ecs" {
   name            = "zivvy-ecs-lb"
   subnets         = aws_subnet.public.*.id
