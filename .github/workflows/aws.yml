@@ -1,5 +1,5 @@
 # This workflow will build and push a new container image to Amazon ECR,
-# and then will deploy a new task definition to Amazon ECS, when there is a push to the "master" branch.
+# and then will deploy a new task definition to Amazon ECS
 
 
 name: Deploy to Amazon ECS
@@ -8,10 +8,10 @@ on:
   push:
     branches: [ "master" ]
     paths:
-     - "ziv-app/**"
+     - "ziv-app/**" # Only deploy if there are changes pushed to this path 
   workflow_dispatch:
   workflow_run:
-    workflows: ["Deploy ECS infrastructure"]
+    workflows: ["Deploy ECS infrastructure"] # Deploy pipeline on completion of infrastructure deployment pipeline
     types:
       - completed
   
@@ -25,9 +25,9 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     environment: zivver
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ (github.event.workflow_run.conclusion == 'success') || (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')   }} 
     env:
-     AWS_REGION: ${{ vars.AWS_REGION }}                  # set this to your preferred AWS region, e.g. us-west-1
+     AWS_REGION: ${{ vars.AWS_REGION }}                  # set this to your preferred AWS region
      ECR_REPOSITORY: ${{ vars.REPOSITORY_NAME }}        # set this to your Amazon ECR repository name
      ECS_SERVICE: ${{ vars.SERVICE_NAME }}                # set this to your Amazon ECS service name
      ECS_CLUSTER: ${{ vars.CLUSTER_NAME }} # set this to your Amazon ECS cluster name
@@ -41,7 +41,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
+    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
