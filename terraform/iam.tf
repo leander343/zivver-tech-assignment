@@ -47,6 +47,7 @@ EOF
 }
 
 
+# Create association of policy with role
 resource "aws_iam_role_policy_attachment" "zivy-webapp-role-policy-attachment" {
   role       = aws_iam_role.zivvy_task_role.name
   policy_arn = aws_iam_policy.ecs_policy.arn

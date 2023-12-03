@@ -4,7 +4,7 @@ data "aws_availability_zones" "zones" {
   state = "available"
 }
 
-
+# Create VPC with /16 CIDR block
 resource "aws_vpc" "ecs" {
   cidr_block = "10.0.0.0/16"
 
@@ -15,7 +15,7 @@ resource "aws_vpc" "ecs" {
   }
 }
 
-#Internet gateway 
+#Internet gateway to allow internet access 
 
 resource "aws_internet_gateway" "ecs" {
   vpc_id = aws_vpc.ecs.id
@@ -25,7 +25,7 @@ resource "aws_internet_gateway" "ecs" {
 }
 
 
-#Public Subnets and route table association 
+#Public Subnets and route table associations 
 
 resource "aws_subnet" "public" {
   count                   = 2
@@ -35,7 +35,7 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = true
 }
 
-
+# Route traffic from subnets to internet gateway 
 resource "aws_route_table" "ecs_public" {
   vpc_id = aws_vpc.ecs.id
 
@@ -53,7 +53,7 @@ resource "aws_route_table_association" "public" {
 }
 
 
-# Private Subnets, Nat gateway and route table association 
+# Private Subnets, NAT gateway and route table association 
 
 resource "aws_subnet" "private" {
   count             = 2
@@ -62,19 +62,20 @@ resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.ecs.id
 }
 
-
+# Create Elastic IP required for NAT gateway 
 resource "aws_eip" "gateway" {
   count      = length(aws_subnet.private)
   depends_on = [aws_internet_gateway.ecs]
 }
 
+# Nat gateway to allow routing traffic to internet from private subnets
 resource "aws_nat_gateway" "gateway" {
   count         = length(aws_subnet.private)
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   allocation_id = element(aws_eip.gateway.*.id, count.index)
 }
 
-
+# Route traffic from subnets to NAT gateways
 resource "aws_route_table" "ecs_private" {
   count  = length(aws_eip.gateway)
   vpc_id = aws_vpc.ecs.id

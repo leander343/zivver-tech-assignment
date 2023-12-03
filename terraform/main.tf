@@ -11,6 +11,7 @@ terraform {
   }
 }
 
+# Configure region for AWS provider
 provider "aws" {
   region = "ap-south-1"
 }

@@ -36,13 +36,13 @@ DEFINITION
 
 }
 
-#ECS cluster 
+#Create ECS cluster 
 
 resource "aws_ecs_cluster" "main" {
   name = "zivvy-cluster"
 }
 
-# ECE service to run task definition 
+# Create ECS service to run with task definition 
 resource "aws_ecs_service" "zivvy_app_service" {
   name                 = "zivvy-service"
   cluster              = aws_ecs_cluster.main.id
@@ -68,6 +68,7 @@ resource "aws_ecs_service" "zivvy_app_service" {
 
   depends_on = [aws_lb_listener.zivvy]
 
+ # This is to prevent errors with Terraform when there are task defintion changes running the CI
   lifecycle {
 
     ignore_changes = [task_definition]
@@ -75,7 +76,7 @@ resource "aws_ecs_service" "zivvy_app_service" {
   }
 }
 
-# Auto scaling policies depening on CPU and Memory parameters 
+# Auto scaling policies depending on CPU and Memory usage 
 
 resource "aws_appautoscaling_target" "target_scaling" {
   max_capacity       = 5
