@@ -5,12 +5,11 @@ provider "aws" {
 
 # Create a S3 bucket to store remote state 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "tfstate-zivvy"
-
-  lifecycle {
-    prevent_destroy = true
-  }
+  bucket = "tfstate-zivvy-${random_uuid.uuid.result}"
+  force_destroy = true
 }
+
+resource "random_uuid" "uuid" {}
 
 resource "aws_s3_bucket_versioning" "terraform_state" {
   bucket = aws_s3_bucket.terraform_state.id
