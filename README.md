@@ -6,6 +6,8 @@ This assignment involves
 * Creating infrastructure to host content
 * Pipeline to deploy content 
 
+Terraform is used to provision the infrastructure and Github actions for CI/CD
+
 ##  Requirements to run project
 
 1. **AWS IAM user account** with sufficient permissions to create the following resources: 
