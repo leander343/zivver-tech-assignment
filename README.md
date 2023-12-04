@@ -121,9 +121,11 @@ Under Actions tabs, select **Deploy to Amazon ECS** > **Run Workflow**
 Under Actions tabs, select **Destroy ECS infrastructure** > **Run Workflow** 
 
 
+### How it works 
+
 When the ECS infrastructure workflow is run with 'Terraform initial run' checked, it subsequently triggers the ECS deployment workflow to deploy the app image replacing the dummy nginx image Terraform deployed with. This is not required for consequetive runs of the workflow once infrastructure is deployed.
 
-Any changes made to the app will only deploy the ECS deployment workflow to build and deploy the image. 
+Any changes made to the terraform or app folder will only then trigger the respective workflows.  
 
 Opening the ECS infrastructure workflow and then the terraform job, which if successful should display the load balancer URL at the end of the terraform apply step, or it can be found in the AWS account under the load balancers tab. 
 
@@ -137,7 +139,7 @@ Opening the ECS infrastructure workflow and then the terraform job, which if suc
 
 ## CI/CD
 
-- The first run of the infrastructure workflow has to be done manually due to having to set a variable triggers required to trigger another workflow.
+- The first run of the infrastructure workflow has to be done manually due to having to set a variable required to trigger another workflow.
 
 - Right now a task definition with a dummy image is deployed on the initial setup and it takes a while before the CI replaces the image on the initial setup. 
  
