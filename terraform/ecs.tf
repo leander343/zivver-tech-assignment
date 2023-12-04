@@ -1,3 +1,8 @@
+# Data source to pull in the latest task definition revision
+data "aws_ecs_task_definition" "zivvy_app" {
+  task_definition = aws_ecs_task_definition.zivvy_app.family
+}
+
 
 # Task definition with a basic nginx image in place which will be replaced with a subsequent CI run
 resource "aws_ecs_task_definition" "zivvy_app" {
@@ -46,7 +51,7 @@ resource "aws_ecs_cluster" "main" {
 resource "aws_ecs_service" "zivvy_app_service" {
   name                 = "zivvy-service"
   cluster              = aws_ecs_cluster.main.id
-  task_definition      = aws_ecs_task_definition.zivvy_app.arn
+  task_definition      = data.aws_ecs_task_definition.zivvy_app.arn
   desired_count        = 1
   launch_type          = "FARGATE"
   force_new_deployment = true
@@ -68,12 +73,6 @@ resource "aws_ecs_service" "zivvy_app_service" {
 
   depends_on = [aws_lb_listener.zivvy]
 
- # This is to prevent errors with Terraform when there are task defintion changes running the CI
-  lifecycle {
-
-    ignore_changes = [task_definition]
-
-  }
 }
 
 # Auto scaling policies depending on CPU and Memory usage 

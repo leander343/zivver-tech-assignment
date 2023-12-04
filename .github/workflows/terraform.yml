@@ -9,9 +9,15 @@ on:
     paths: 
      - "terraform/**" 
   workflow_dispatch:
+    inputs:
+      initial_run:
+        description: 'Terraform initial run'
+        required: false
+        type: boolean
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   terraform:
@@ -80,6 +86,22 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/master' && steps.plan.outputs.exitcode == 2 # Execute only in case there are changes 
       run: terraform apply -auto-approve terraplan 
+
+  dispatch:
+     name: 'Dispatch ECS event'
+     runs-on: ubuntu-latest
+     needs: [terraform]
+     defaults:
+      run:
+        shell: bash
+     steps:
+      - name: Invoke workflow with inputs
+        uses: benc-uk/workflow-dispatch@v1
+        if: ${{ inputs.initial_run }}
+        with:
+         workflow: aws.yml
+
+
 
 
 

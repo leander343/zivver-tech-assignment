@@ -11,13 +11,8 @@ on:
     paths:
      - "ziv-app/**" 
   workflow_dispatch:
-  # Trigger workflow on completion of infrastructure workflow 
-  workflow_run:
-    workflows: ["Deploy ECS infrastructure"] 
-    types:
-      - completed
-  
-    
+
+
 permissions:
   contents: read
 
@@ -26,7 +21,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: ${{ (github.event.workflow_run.conclusion != 'failure') }}
     env:
      AWS_REGION: ${{ vars.AWS_REGION }}                  
      ECR_REPOSITORY: ${{ vars.REPOSITORY_NAME }}        
