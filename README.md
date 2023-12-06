@@ -163,7 +163,7 @@ Opening the ECS infrastructure workflow and then the terraform job, which if suc
 
 - While secrets aren't used for containers yet, they have to be securely passed into the container. 
 
-- Encrypting the S3 bucket that the state is stored in and having a restrictive bucket policies.
+- Encrypting the ECR repository,S3 bucket that the state is stored in and having a restrictive bucket policies.
 
 ## Availability & Scalability
 
