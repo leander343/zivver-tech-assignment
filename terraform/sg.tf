@@ -3,7 +3,7 @@ resource "aws_security_group" "lb" {
   name   = "load-balancer-security-group"
   vpc_id = aws_vpc.ecs.id
 
-# Ingress rule to allow all HTTP traffic
+  # Ingress rule to allow all HTTP traffic
   ingress {
     protocol    = "tcp"
     from_port   = 80
@@ -24,7 +24,7 @@ resource "aws_security_group" "ecs" {
   name   = "ecs-security-group"
   vpc_id = aws_vpc.ecs.id
 
-# Ingress rule to allow traffic only from load balancer's security group
+  # Ingress rule to allow traffic only from load balancer's security group
   ingress {
     protocol        = "tcp"
     from_port       = 80
